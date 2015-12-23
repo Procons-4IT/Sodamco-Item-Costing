@@ -1,0 +1,21 @@
+<Application>
+  <Menus>
+    <action type="add">
+      <!-- <Menu Checked="0" Enabled="1" FatherUID="2816" Image="" Position="1" String="MultiCurrency Incoming Payment"
+				Type="1" UniqueID="DABT_521">
+      </Menu> -->
+      <!--<Menu Checked="0" Enabled="1" FatherUID="43541" Image="" Position="4" String="Special Price By Project"
+      Type="1" UniqueID="MNU_OPSP">
+      </Menu>
+      <Menu Checked="0" Enabled="1" FatherUID="11264" Image="" Position="2" String="Commission Type"
+      Type="1" UniqueID="MNU_OCMT">
+      </Menu>
+      <Menu Checked="0" Enabled="1" FatherUID="3072" Image="" Position="1" String="Promotion Template"
+    Type="1" UniqueID="MNU_OPRM">
+      </Menu>
+      <Menu Checked="0" Enabled="1" FatherUID="3072" Image="" Position="2" String="Promotion Mapping"
+  Type="1" UniqueID="MNU_OCPR">-->
+      <!--</Menu>-->
+    </action>
+  </Menus>
+</Application>
