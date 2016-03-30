@@ -68,8 +68,7 @@ Public Class clsInvoice
                 Case True
 
                 Case False
-                    Select Case BusinessObjectInfo.EventType
-                       
+                    Select Case BusinessObjectInfo.EventType                      
                     End Select
             End Select
         Catch ex As Exception

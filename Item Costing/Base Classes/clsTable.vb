@@ -340,6 +340,9 @@ Public NotInheritable Class clsTable
             'addField("PSP1", "DisType", "Discount Type", SAPbobsCOM.BoFieldTypes.db_Alpha, 1, SAPbobsCOM.BoFldSubTypes.st_None, "D,P", "Discount,Price", "")
             'AddFields("PSP1", "Discount", "Discount", SAPbobsCOM.BoFieldTypes.db_Float, , , SAPbobsCOM.BoFldSubTypes.st_Percentage)
             'AddFields("PSP1", "DisPrice", "Price After Price", SAPbobsCOM.BoFieldTypes.db_Float, , , SAPbobsCOM.BoFldSubTypes.st_Price)
+            AddTables("OPSP", "Project Setup", SAPbobsCOM.BoUTBTableType.bott_Document)
+            AddFields("OPSP", "UserName", "User Name", SAPbobsCOM.BoFieldTypes.db_Alpha, , 100)
+            AddFields("OPSP", "Password", "Password", SAPbobsCOM.BoFieldTypes.db_Alpha, , 100)
 
             AddFields("OITW", "AvgRMCst", "Average RM Cost", SAPbobsCOM.BoFieldTypes.db_Float, , , SAPbobsCOM.BoFldSubTypes.st_Price)
             AddFields("OITW", "AvgFLbCst", "Average Fixed Labour  Cost", SAPbobsCOM.BoFieldTypes.db_Float, , , SAPbobsCOM.BoFldSubTypes.st_Price)
@@ -502,6 +505,7 @@ Public NotInheritable Class clsTable
 
     Public Sub CreateUDO()
         Try
+            AddUDO("UDO_OPSP", "Project Setup", "OPSP", "U_UserName", , , SAPbobsCOM.BoUDOObjType.boud_Document)
             'AddUDO("UDO_OPSP", "Project Special Price", "OPSP", "U_PrjCode", "U_PrjName", "PSP1", SAPbobsCOM.BoUDOObjType.boud_Document)
             'AddUDO("UDO_OPRM", "Promotion Template", "OPRM", "U_PrCode", "U_PrName", "PRM1", SAPbobsCOM.BoUDOObjType.boud_Document)
             'AddUDO("UDO_OPRT", "Promotion Template", "OPRT", "U_PrmCode", "U_PrmName", "PRT1", SAPbobsCOM.BoUDOObjType.boud_Document)

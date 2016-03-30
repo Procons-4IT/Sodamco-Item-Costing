@@ -4,6 +4,16 @@ Public Class clsListener
     Private ThreadClose As New Threading.Thread(AddressOf CloseApp)
     Private WithEvents _SBO_Application As SAPbouiCOM.Application
     Private _Company As SAPbobsCOM.Company
+    Private _SUserCompany As SAPbobsCOM.Company
+    Public ReadOnly Property AdminCompany() As SAPbobsCOM.Company
+        Get
+
+            If Not _SUserCompany Is Nothing Then
+                _SUserCompany = Utilities.connectSUserCompany(_Company)
+            End If
+            Return _SUserCompany
+        End Get
+    End Property
     Private _Utilities As clsUtilities
     Private _Collection As Hashtable
     Private _LookUpCollection As Hashtable
@@ -42,10 +52,14 @@ Public Class clsListener
         End Get
     End Property
 
-    Public ReadOnly Property Company() As SAPbobsCOM.Company
+    Public Property Company() As SAPbobsCOM.Company
         Get
             Return _Company
         End Get
+        Set(value As SAPbobsCOM.Company)
+            _Company = value
+        End Set
+
     End Property
 
     Public ReadOnly Property Utilities() As clsUtilities
@@ -93,7 +107,7 @@ Public Class clsListener
             objFilter.AddEx(frm_ARCreditMemo) 'AR Credit Memo
             'objFilter.AddEx(frm_Customer) 'Customer
             'objFilter.AddEx(frm_ORDR) 'Order
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OPSP) 'Special Price
             'objFilter.AddEx(frm_Banking) ' Banking
             'objFilter.AddEx(frm_ComType) 'Commission Type
             'objFilter.AddEx(frm_CommCharges) 'Commission Charges
@@ -132,17 +146,17 @@ Public Class clsListener
             objFilter.AddEx(frm_GI_INVENTORY) ' Inventory Goods Issue
 
 
-            'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_MENU_CLICK)
+            objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_MENU_CLICK)
             'objFilter.AddEx(frm_ORDR) 'Order
             'objFilter.AddEx(frm_Customer) 'Customer
             'objFilter.AddEx(frm_IncomingPayment) 'Incoming Payment
             'objFilter.AddEx(frm_OutPayment) 'OutGoing Payment
             'objFilter.AddEx(frm_Deposits) 'Deposits
             'objFilter.AddEx(frm_OCPR) 'Promotion Mapping
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OPSP) 'Special Price
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED)
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OPSP) 'Special Price
             objFilter.AddEx(frm_ProdReceipt) 'Production Receipt
             objFilter.AddEx(frm_Delivery) 'Delivery
             objFilter.AddEx(frm_INVOICES) 'Invoice
@@ -164,14 +178,14 @@ Public Class clsListener
             objFilter.AddEx(frm_GI_INVENTORY) ' Inventory Goods Issue
             objFilter.AddEx(frm_INVOICESPAYMENT) ' Invoice + Payment
 
-            'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_COMBO_SELECT)
+            objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_COMBO_SELECT)
             'objFilter.AddEx(frm_CommCharges) 'Commission Charges
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OPSP) 'Special Price
             ''objFilter.AddEx(frm_OPRT) 'Promotion Template
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST)
             'objFilter.Add(frm_Project) ' Project
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OPSP) 'Special Price
             objFilter.AddEx(frm_ITEM_MASTER) ' Item Master
             'objFilter.AddEx(frm_Banking) ' Banking
             'objFilter.AddEx(frm_CommCharges) 'Commission Charges
@@ -188,19 +202,19 @@ Public Class clsListener
             'objFilter.AddEx(frm_ComType) 'Commission Type
             'objFilter.AddEx(frm_DocumentFreight) 'Document Freight
 
-            'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_LOST_FOCUS)
+            objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_LOST_FOCUS)
             'objFilter.AddEx(frm_ORDR) ' Order
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OPSP) 'Special Price
             'objFilter.AddEx(frm_DocumentFreight) 'Document Freight
 
-            'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD)
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD)
+            objFilter.AddEx(frm_OPSP) 'Special Price
             'objFilter.AddEx(frm_OPRM) 'Promotion
             'objFilter.AddEx(frm_ORDR) ' Order
             ''objFilter.AddEx(frm_OPRT) 'Promotion Template
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_CLICK)
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OPSP) 'Special Price
             'objFilter.AddEx(frm_Delivery) 'Delivery
             'objFilter.AddEx(frm_OPRM) 'Promotion
             'objFilter.AddEx(frm_ORDR) 'Order
@@ -255,8 +269,8 @@ Public Class clsListener
             'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_FORM_RESIZE)
             'objFilter.AddEx(frm_OCPR) 'Promotion
 
-            'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_VALIDATE)
-            'objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_VALIDATE)
+            objFilter.AddEx(frm_OPSP) 'Special Price
             'objFilter.AddEx(frm_DocumentFreight) 'Document Freight
 
             'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_DOUBLE_CLICK)
@@ -391,27 +405,27 @@ Public Class clsListener
         Try
             If pVal.BeforeAction = False Then
                 Select Case pVal.MenuUID
-                    'Case mnu_OPSP
-                    '    oMenuObject = New clsSpecialPrice
-                    '    oMenuObject.MenuEvent(pVal, BubbleEvent)
-                    'Case mnu_PRJL, mnu_CPRL_O
-                    '    oMenuObject = New clsOrder
-                    '    oMenuObject.MenuEvent(pVal, BubbleEvent)
-                    'Case mnu_PRJL_C, mnu_CPRL_C
-                    '    oMenuObject = New clsCustomer
-                    '    oMenuObject.MenuEvent(pVal, BubbleEvent)
-                    'Case mnu_ComType
-                    '    oMenuObject = New clsComType
-                    '    oMenuObject.MenuEvent(pVal, BubbleEvent)
-                    'Case mnu_COMM_I
-                    '    oMenuObject = New clsIncomingPayment
-                    '    oMenuObject.MenuEvent(pVal, BubbleEvent)
-                    'Case mnu_COMM_O
-                    '    oMenuObject = New clsOutGoingPayment
-                    '    oMenuObject.MenuEvent(pVal, BubbleEvent)
-                    'Case mnu_COMM_D
-                    '    oMenuObject = New clsDeposit
-                    '    oMenuObject.MenuEvent(pVal, BubbleEvent)
+                    Case mnu_OPSP
+                        oMenuObject = New clsOProjectSetup
+                        oMenuObject.MenuEvent(pVal, BubbleEvent)
+                        'Case mnu_PRJL, mnu_CPRL_O
+                        '    oMenuObject = New clsOrder
+                        '    oMenuObject.MenuEvent(pVal, BubbleEvent)
+                        'Case mnu_PRJL_C, mnu_CPRL_C
+                        '    oMenuObject = New clsCustomer
+                        '    oMenuObject.MenuEvent(pVal, BubbleEvent)
+                        'Case mnu_ComType
+                        '    oMenuObject = New clsComType
+                        '    oMenuObject.MenuEvent(pVal, BubbleEvent)
+                        'Case mnu_COMM_I
+                        '    oMenuObject = New clsIncomingPayment
+                        '    oMenuObject.MenuEvent(pVal, BubbleEvent)
+                        'Case mnu_COMM_O
+                        '    oMenuObject = New clsOutGoingPayment
+                        '    oMenuObject.MenuEvent(pVal, BubbleEvent)
+                        'Case mnu_COMM_D
+                        '    oMenuObject = New clsDeposit
+                        '    oMenuObject.MenuEvent(pVal, BubbleEvent)
                     Case mnu_ADD, mnu_FIND, mnu_FIRST, mnu_LAST, mnu_NEXT, mnu_PREVIOUS, mnu_ADD_ROW, mnu_DELETE_ROW
                         If IsNothing(_FormUID) Then
                         Else
@@ -489,6 +503,7 @@ Public Class clsListener
 #Region "Item Event"
 
     Private Sub SBO_Application_ItemEvent(ByVal FormUID As String, ByRef pVal As SAPbouiCOM.ItemEvent, ByRef BubbleEvent As Boolean) Handles _SBO_Application.ItemEvent
+
         Try
             _FormUID = FormUID
             If pVal.BeforeAction = False And pVal.EventType = SAPbouiCOM.BoEventTypes.et_FORM_LOAD Then
@@ -496,6 +511,12 @@ Public Class clsListener
                     Case frm_GRPO
                         If Not _Collection.ContainsKey(FormUID) Then
                             oItemObject = New clsGRPO
+                            oItemObject.FrmUID = FormUID
+                            _Collection.Add(FormUID, oItemObject)
+                        End If
+                    Case frm_OPSP
+                        If Not _Collection.ContainsKey(FormUID) Then
+                            oItemObject = New clsOProjectSetup
                             oItemObject.FrmUID = FormUID
                             _Collection.Add(FormUID, oItemObject)
                         End If

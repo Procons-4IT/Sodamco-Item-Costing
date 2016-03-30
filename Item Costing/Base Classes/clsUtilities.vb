@@ -6,6 +6,8 @@ Public Class clsUtilities
     Private FormNum As Integer
     Private oRecordSet As SAPbobsCOM.Recordset
     Private oEditText As SAPbouiCOM.EditText
+    Private orig_userName As String
+    Private orig_password As String
 
     Public Sub New()
         MyBase.New()
@@ -29,13 +31,54 @@ Public Class clsUtilities
             If oApplication.Company.Connect() <> 0 Then
                 Throw New Exception("Cannot connect to company database. ")
             End If
+            orig_userName = oApplication.Company.UserName
+            orig_password = oApplication.Company.Password
+
+
 
         Catch ex As Exception
             Throw ex
         End Try
     End Sub
+    Public Function connectSUserCompany(ByRef defaultConnection As SAPbobsCOM.Company) As SAPbobsCOM.Company
+        Dim username, password
+        getAdminUser(username, password)
+        Return changeUser(defaultConnection, username, password)
+    End Function
+    Public Function changeUser(ByRef oCompany As SAPbobsCOM.Company, ByVal userName As String, ByVal password As String) As SAPbobsCOM.Company
+        Dim newCompany As SAPbobsCOM.Company = New SAPbobsCOM.Company()
+        newCompany.DbServerType = oCompany.DbServerType
+        newCompany.Server = oCompany.Server
+        newCompany.language = oCompany.language
+        newCompany.CompanyDB = oCompany.CompanyDB
+        newCompany.UserName = userName
+        newCompany.Password = password
+        newCompany.UseTrusted = oCompany.UseTrusted
+        newCompany.LicenseServer = oCompany.LicenseServer
+
+        Dim lRectCode As Integer = newCompany.Connect
+        If lRectCode = 0 Then
+
+            Return newCompany
+        End If
+
+        Return Nothing
+
+    End Function
+    Public Sub getAdminUser(ByRef userName As String, ByRef password As String)
+        password = String.Empty
+        userName = String.Empty
+        Dim oTemp As SAPbobsCOM.Recordset
+        oTemp = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+        oTemp.DoQuery("SELECT U_UserName,U_Password from [@OPSP] where DocEntry = 1")
+        password = oTemp.Fields.Item(1).Value.ToString
+        userName = oTemp.Fields.Item(0).Value.ToString
+        Dim crypt As New CryptoUtility
+        password = crypt.Decrypt(password)
+
+    End Sub
 #End Region
-  
+
 #Region "Genral Functions"
 
 #Region "Status Message"
@@ -1237,7 +1280,7 @@ Public Class clsUtilities
                     End If
                 End If
 
-               
+
                 If Not _retVal Then
                     Exit For
                 End If
@@ -1369,7 +1412,7 @@ Public Class clsUtilities
                 Dim blnJEAdd As Boolean = False
                 oDoc_Lines = oDoc.Lines
 
-                oJE = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oJournalEntries)
+                oJE = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oJournalEntries)
                 oJE.ReferenceDate = oDoc.DocDate
                 oJE.TaxDate = oDoc.TaxDate
                 oJE.DueDate = oDoc.DocDueDate
@@ -1617,7 +1660,7 @@ Public Class clsUtilities
                             strQuery = "Select ISNULL(StornoToTr,'0') From OJDT Where StornoToTr = '" + oDoc_Lines.UserFields.Fields.Item("U_JEDocEty").Value.ToString + "'"
                             oRecordSet.DoQuery(strQuery)
                             If oRecordSet.EoF Then
-                                oJE = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oJournalEntries)
+                                oJE = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oJournalEntries)
                                 If oJE.GetByKey(oDoc_Lines.UserFields.Fields.Item("U_JEDocEty").Value.ToString) Then
                                     intCode1 = oJE.Cancel()
                                     If intCode1 <> 0 Then
@@ -2107,7 +2150,7 @@ Public Class clsUtilities
         Try
             Dim strQuery As String
             Dim oDoc As SAPbobsCOM.StockTransfer = Nothing
-            Dim oDoc_Lines As SAPbobsCOM.StockTransfer_Lines 
+            Dim oDoc_Lines As SAPbobsCOM.StockTransfer_Lines
             Dim dblTCost As Double
             Dim dlbItemCost As Double
             Dim oDocItem As SAPbobsCOM.Items

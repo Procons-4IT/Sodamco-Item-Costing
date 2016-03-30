@@ -59,6 +59,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -79,25 +80,28 @@
     <Compile Include="Base Classes\clsStart.vb" />
     <Compile Include="Base Classes\clsTable.vb" />
     <Compile Include="Base Classes\clsUtilities.vb" />
+    <Compile Include="Base Classes\CryptoUtility.vb" />
     <Compile Include="Base Classes\DBConnection.vb" />
-    <Compile Include="Business Logics\clsARCreditMemo.vb">
+    <Compile Include="Modules\Business Logics\clsARCreditMemo.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Business Logics\clsDelivery.vb" />
-    <Compile Include="Business Logics\clsGRPO.vb" />
-    <Compile Include="Business Logics\clsItemMaster.vb" />
-    <Compile Include="Business Logics\clsProdReceipt.vb" />
-    <Compile Include="Business Logics\clsReturn.vb" />
-    <Compile Include="Business Logics\clsInvoice.vb" />
-    <Compile Include="Business Logics\clsSystemForms.vb" />
-    <Compile Include="Business Logics\clsInvoicePayment.vb" />
-    <Compile Include="Business Logics\clsReverseInvoice.vb" />
-    <Compile Include="Business Logics\clsIGI.vb" />
-    <Compile Include="Business Logics\clsIGR.vb" />
-    <Compile Include="Business Logics\clsITransfer.vb" />
-    <Compile Include="Business Logics\clsPurchaseReturn.vb" />
-    <Compile Include="Business Logics\clsAPCreditMemo.vb" />
-    <Compile Include="Business Logics\Custom_ChooseFromList.vb" />
+    <Compile Include="Modules\Business Logics\clsDelivery.vb" />
+    <Compile Include="Modules\Business Logics\clsGRPO.vb" />
+    <Compile Include="Modules\Business Logics\clsItemMaster.vb" />
+    <Compile Include="Modules\Business Logics\clsOProjectSetup.vb" />
+    <Compile Include="Modules\Business Logics\clsProdReceipt.vb" />
+    <Compile Include="Modules\Business Logics\clsReturn.vb" />
+    <Compile Include="Modules\Business Logics\clsInvoice.vb" />
+    <Compile Include="Modules\Business Logics\clsSpecialPrice.vb" />
+    <Compile Include="Modules\Business Logics\clsSystemForms.vb" />
+    <Compile Include="Modules\Business Logics\clsInvoicePayment.vb" />
+    <Compile Include="Modules\Business Logics\clsReverseInvoice.vb" />
+    <Compile Include="Modules\Business Logics\clsIGI.vb" />
+    <Compile Include="Modules\Business Logics\clsIGR.vb" />
+    <Compile Include="Modules\Business Logics\clsITransfer.vb" />
+    <Compile Include="Modules\Business Logics\clsPurchaseReturn.vb" />
+    <Compile Include="Modules\Business Logics\clsAPCreditMemo.vb" />
+    <Compile Include="Modules\Business Logics\Custom_ChooseFromList.vb" />
     <Compile Include="Modules\modVariables.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
