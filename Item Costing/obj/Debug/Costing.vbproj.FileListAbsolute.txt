@@ -62,10 +62,6 @@ G:\International Projects_SAP9.0\Procons-4IT\Sodamco\Sodamco Projects splitups\I
 G:\International Projects_SAP9.0\Procons-4IT\Sodamco\Sodamco Projects splitups\Item Costing\20151030_Costing_1.0.3\bin\Debug\Interop.Scripting.dll
 G:\International Projects_SAP9.0\Procons-4IT\Sodamco\Sodamco Projects splitups\Item Costing\20151030_Costing_1.0.3\obj\Debug\Costing.Resources.resources
 G:\International Projects_SAP9.0\Procons-4IT\Sodamco\Sodamco Projects splitups\Item Costing\20151030_Costing_1.0.3\obj\Debug\Costing.vbproj.GenerateResource.Cache
-C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Interop.SAPbobsCOM.dll
-C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\bin\Debug\Interop.SAPbobsCOM.dll
-C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\bin\Debug\Interop.SAPbouiCOM.dll
-C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Interop.SAPbouiCOM.dll
 C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Interop.Scripting.dll
 C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Costing.vbproj.ResolveComReference.cache
 C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\bin\Debug\Costing.exe
@@ -77,3 +73,5 @@ C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Costing.vbproj.Gene
 C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Costing.exe
 C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Costing.xml
 C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Costing.pdb
+C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\bin\Debug\Interop.SAPbobsCOM.dll
+C:\SAP Solutions\Sodamco-Item-Costing\Item Costing\obj\Debug\Interop.SAPbobsCOM.dll

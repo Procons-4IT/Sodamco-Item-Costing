@@ -8,7 +8,7 @@ Public Class clsListener
     Public ReadOnly Property AdminCompany() As SAPbobsCOM.Company
         Get
 
-            If Not _SUserCompany Is Nothing Then
+            If _SUserCompany Is Nothing Then
                 _SUserCompany = Utilities.connectSUserCompany(_Company)
             End If
             Return _SUserCompany
@@ -308,7 +308,7 @@ Public Class clsListener
                         Case SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD
                             If Not BusinessObjectInfo.BeforeAction Then
                                 If BusinessObjectInfo.ActionSuccess Then
-                                    '  oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
+                                    oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
                                 End If
                             End If
                     End Select
@@ -318,7 +318,7 @@ Public Class clsListener
                             If Not BusinessObjectInfo.BeforeAction Then
                                 If BusinessObjectInfo.ActionSuccess Then
                                     oApplication.Utilities.update_RMPCosting_Sale_In(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
-                                    '  oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
+                                      oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
                                 End If
                             End If
                     End Select

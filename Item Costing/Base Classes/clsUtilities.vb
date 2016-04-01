@@ -70,6 +70,7 @@ Public Class clsUtilities
         userName = String.Empty
         Dim oTemp As SAPbobsCOM.Recordset
         oTemp = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+
         oTemp.DoQuery("SELECT U_UserName,U_Password from [@OPSP] where DocEntry = 1")
         password = oTemp.Fields.Item(1).Value.ToString
         userName = oTemp.Fields.Item(0).Value.ToString
@@ -1691,7 +1692,7 @@ Public Class clsUtilities
                         blnStatus = False
                     Else
                         Dim intJE As Integer
-                        intJE = oApplication.Company.GetNewObjectKey()
+                        intJE = Convert.ToInt32(oApplication.AdminCompany.GetNewObjectKey())
                         If oJE.GetByKey(intJE) Then
                             oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                             strQuery = "Update " + strTable + " Set U_JEDocEty = '" + intJE.ToString + "' Where DocEntry = '" + oDoc.DocEntry.ToString + "' And ISNULL(U_JEDocEty,'') = ''"
