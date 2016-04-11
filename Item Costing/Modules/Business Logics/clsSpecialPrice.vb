@@ -20,7 +20,7 @@ Public Class clsSpecialPrice
 
     Public Sub LoadForm()
         Try
-            oForm = oApplication.Utilities.LoadForm(xml_OPSP, frm_OPSP)
+            oForm = oApplication.Utilities.LoadForm(xml_OSUS, frm_OSUS)
             oForm = oApplication.SBO_Application.Forms.ActiveForm()
             oForm.Freeze(True)
             initializeDataSource(oForm)
@@ -38,7 +38,7 @@ Public Class clsSpecialPrice
 
     Public Sub LoadForm(ByVal strProjectCode As String, ByVal strProjectName As String, ByVal strCust As String, ByVal strName As String, ByVal strEffFrom As String, ByVal strEffTo As String)
         Try
-            oForm = oApplication.Utilities.LoadForm(xml_OPSP, frm_OPSP)
+            oForm = oApplication.Utilities.LoadForm(xml_OSUS, frm_OSUS)
             oForm = oApplication.SBO_Application.Forms.ActiveForm
             oForm.Freeze(True)
             initializeDataSource(oForm)
@@ -62,7 +62,7 @@ Public Class clsSpecialPrice
 
     Public Sub LoadForm(ByVal strDocEntry As String)
         Try
-            oForm = oApplication.Utilities.LoadForm(xml_OPSP, frm_OPSP)
+            oForm = oApplication.Utilities.LoadForm(xml_OSUS, frm_OSUS)
             oForm = oApplication.SBO_Application.Forms.ActiveForm()
             oForm.Freeze(True)
             initializeDataSource(oForm)
@@ -83,7 +83,7 @@ Public Class clsSpecialPrice
 
     Private Sub initialize(ByVal oForm As SAPbouiCOM.Form)
         Try
-            oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+            oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
             oDBDataSourceLines = oForm.DataSources.DBDataSources.Item("@PSP1")
 
             oMatrix = oForm.Items.Item("3").Specific
@@ -94,7 +94,7 @@ Public Class clsSpecialPrice
             clearDataSource(oForm)
 
             oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            oRecordSet.DoQuery("Select IsNull(MAX(DocEntry),1) From [@OPSP]")
+            oRecordSet.DoQuery("Select IsNull(MAX(DocEntry),1) From [@OSUS]")
             If Not oRecordSet.EoF Then
                 oDBDataSource.SetValue("DocNum", 0, oRecordSet.Fields.Item(0).Value.ToString())
             End If
@@ -269,7 +269,7 @@ Public Class clsSpecialPrice
     Private Sub RefereshDeleteRow(ByVal aForm As SAPbouiCOM.Form)
         Try
             oMatrix = aForm.Items.Item("3").Specific
-            oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+            oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
             oDBDataSourceLines = oForm.DataSources.DBDataSources.Item("@PSP1")
             If Me.MatrixId = "3" Then
                 oDBDataSourceLines = oForm.DataSources.DBDataSources.Item("@PSP1")
@@ -295,7 +295,7 @@ Public Class clsSpecialPrice
         Try
             oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
             oMatrix = oForm.Items.Item("3").Specific
-            oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+            oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
             oDBDataSourceLines = oForm.DataSources.DBDataSources.Item("@PSP1")
 
             Dim oTest As SAPbobsCOM.Recordset
@@ -357,7 +357,7 @@ Public Class clsSpecialPrice
             Next
             oMatrix.LoadFromDataSource()
             oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            strQuery = "Select 1 As 'Return',DocEntry From [@OPSP]"
+            strQuery = "Select 1 As 'Return',DocEntry From [@OSUS]"
             strQuery += " Where "
             strQuery += " (('" + oDBDataSource.GetValue("U_EffFrom", 0).ToString() + "' Between Convert(VarChar(12),U_EffFrom,112) And Convert(VarChar(12),U_EffTo,112)) "
             strQuery += " OR "
@@ -381,7 +381,7 @@ Public Class clsSpecialPrice
 #Region "Item Event"
     Public Overrides Sub ItemEvent(ByVal FormUID As String, ByRef pVal As SAPbouiCOM.ItemEvent, ByRef BubbleEvent As Boolean)
         Try
-            If pVal.FormTypeEx = frm_OPSP Then
+            If pVal.FormTypeEx = frm_OSUS Then
                 Select Case pVal.BeforeAction
                     Case True
                         Select Case pVal.EventType
@@ -403,7 +403,7 @@ Public Class clsSpecialPrice
                             Case SAPbouiCOM.BoEventTypes.et_CLICK
                                 oForm = oApplication.SBO_Application.Forms.Item(FormUID)
                                 If pVal.ItemUID = "3" Then
-                                    oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+                                    oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
                                     Me.intSelectedMatrixrow = pVal.Row
                                     If (oDBDataSource.GetValue("U_PrjCode", 0).ToString() = "") Then
                                         oApplication.SBO_Application.SetStatusBarMessage("Select Project Code to Proceed...", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
@@ -415,24 +415,24 @@ Public Class clsSpecialPrice
                                         BubbleEvent = False
                                     End If
                                 End If
-                            Case SAPbouiCOM.BoEventTypes.et_VALIDATE
-                                If pVal.ItemUID = "3" And (pVal.ColUID = "V_6") And pVal.Row > 0 Then
-                                    oForm = oApplication.SBO_Application.Forms.Item(FormUID)
-                                    oMatrix = oForm.Items.Item("3").Specific
-                                    oMatrix.FlushToDataSource()
-                                    oDBDataSourceLines = oForm.DataSources.DBDataSources.Item("@PSP1")
-                                    Dim dblDiscount As Double
-                                    Dim strType As String
-                                    strType = oDBDataSourceLines.GetValue("U_DisType", pVal.Row - 1)
-                                    dblDiscount = oDBDataSourceLines.GetValue("U_Discount", pVal.Row - 1)
-                                    If strType = "D" Then
-                                        If dblDiscount > 100 Then
-                                            oApplication.SBO_Application.SetStatusBarMessage("Enter Discount Percentage Should be Less than Or Equal to 100...", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
-                                            BubbleEvent = False
-                                        End If
-                                    End If
-                                End If
-                        End Select
+                                '    Case SAPbouiCOM.BoEventTypes.et_VALIDATE
+                                '        If pVal.ItemUID = "3" And (pVal.ColUID = "V_6") And pVal.Row > 0 Then
+                                '            oForm = oApplication.SBO_Application.Forms.Item(FormUID)
+                                '            oMatrix = oForm.Items.Item("3").Specific
+                                '            oMatrix.FlushToDataSource()
+                                '            oDBDataSourceLines = oForm.DataSources.DBDataSources.Item("@PSP1")
+                                '            Dim dblDiscount As Double
+                                '            Dim strType As String
+                                '            strType = oDBDataSourceLines.GetValue("U_DisType", pVal.Row - 1)
+                                '            dblDiscount = oDBDataSourceLines.GetValue("U_Discount", pVal.Row - 1)
+                                '            If strType = "D" Then
+                                '                If dblDiscount > 100 Then
+                                '                    oApplication.SBO_Application.SetStatusBarMessage("Enter Discount Percentage Should be Less than Or Equal to 100...", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                                '                    BubbleEvent = False
+                                '                End If
+                                '            End If
+                                '        End If
+                                'End Select
                     Case False
                         Select Case pVal.EventType
                             Case SAPbouiCOM.BoEventTypes.et_FORM_LOAD
@@ -453,7 +453,7 @@ Public Class clsSpecialPrice
                                 End Select
                             Case SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST
                                 oForm = oApplication.SBO_Application.Forms.Item(FormUID)
-                                oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+                                oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
                                 oDBDataSourceLines = oForm.DataSources.DBDataSources.Item("@PSP1")
                                 Dim oCFLEvento As SAPbouiCOM.IChooseFromListEvent
                                 Dim oDataTable As SAPbouiCOM.DataTable
@@ -544,6 +544,7 @@ Public Class clsSpecialPrice
                                     oForm.Freeze(False)
                                 End If
                         End Select
+                        End Select
                 End Select
             End If
         Catch ex As Exception
@@ -557,7 +558,7 @@ Public Class clsSpecialPrice
     Public Overrides Sub MenuEvent(ByRef pVal As SAPbouiCOM.MenuEvent, ByRef BubbleEvent As Boolean)
         Try
             Select Case pVal.MenuUID
-                Case mnu_OPSP
+                Case mnu_OSUS
                     LoadForm()
                 Case mnu_FIRST, mnu_LAST, mnu_NEXT, mnu_PREVIOUS
                     oForm = oApplication.SBO_Application.Forms.ActiveForm()
@@ -566,9 +567,9 @@ Public Class clsSpecialPrice
                     End If
                 Case mnu_ADD_ROW
                     oForm = oApplication.SBO_Application.Forms.ActiveForm()
-                    If oForm.TypeEx = frm_OPSP Then
+                    If oForm.TypeEx = frm_OSUS Then
 
-                        oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+                        oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
                         If oDBDataSource.GetValue("Status", 0).Trim() = "C" Then
                             oApplication.Utilities.Message("Document Status Closed...", SAPbouiCOM.BoStatusBarMessageType.smt_Error)
                         Else
@@ -579,20 +580,20 @@ Public Class clsSpecialPrice
                     End If
                 Case mnu_DELETE_ROW
                     oForm = oApplication.SBO_Application.Forms.ActiveForm()
-                    If oForm.TypeEx = frm_OPSP Then
-                        oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+                    If oForm.TypeEx = frm_OSUS Then
+                        oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
                         If oDBDataSource.GetValue("Status", 0).Trim() = "C" Then
                             oApplication.Utilities.Message("Document Status Closed...", SAPbouiCOM.BoStatusBarMessageType.smt_Error)
                         Else
                             If pVal.BeforeAction = False Then
-                                RefereshDeleteRow(oForm)
+                                'RefereshDeleteRow(oForm)
                             End If
                         End If
                     End If
                 Case mnu_ADD
                     If pVal.BeforeAction = False Then
                         oForm = oApplication.SBO_Application.Forms.ActiveForm()
-                        If oForm.TypeEx = frm_OPSP Then
+                        If oForm.TypeEx = frm_OSUS Then
                             initialize(oForm)
                             oForm.Items.Item("7").Enabled = False
                             oForm.Items.Item("19").Enabled = False
@@ -602,7 +603,7 @@ Public Class clsSpecialPrice
                 Case mnu_FIND
                     If pVal.BeforeAction = False Then
                         oForm = oApplication.SBO_Application.Forms.ActiveForm()
-                        If oForm.TypeEx = frm_OPSP Then
+                        If oForm.TypeEx = frm_OSUS Then
                             clearDataSource(oForm)
                             enableControl(oForm, True)
                             oForm.Items.Item("7").Enabled = True
@@ -621,7 +622,7 @@ Public Class clsSpecialPrice
     Public Sub FormDataEvent(ByRef BusinessObjectInfo As SAPbouiCOM.BusinessObjectInfo, ByRef BubbleEvent As Boolean)
         Try
             oForm = oApplication.SBO_Application.Forms.Item(BusinessObjectInfo.FormUID)
-            If oForm.TypeEx = frm_OPSP Then
+            If oForm.TypeEx = frm_OSUS Then
                 Select Case BusinessObjectInfo.BeforeAction
                     Case True
 

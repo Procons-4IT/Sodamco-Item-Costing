@@ -107,7 +107,7 @@ Public Class clsListener
             objFilter.AddEx(frm_ARCreditMemo) 'AR Credit Memo
             'objFilter.AddEx(frm_Customer) 'Customer
             'objFilter.AddEx(frm_ORDR) 'Order
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
             'objFilter.AddEx(frm_Banking) ' Banking
             'objFilter.AddEx(frm_ComType) 'Commission Type
             'objFilter.AddEx(frm_CommCharges) 'Commission Charges
@@ -153,10 +153,10 @@ Public Class clsListener
             'objFilter.AddEx(frm_OutPayment) 'OutGoing Payment
             'objFilter.AddEx(frm_Deposits) 'Deposits
             'objFilter.AddEx(frm_OCPR) 'Promotion Mapping
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED)
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
             objFilter.AddEx(frm_ProdReceipt) 'Production Receipt
             objFilter.AddEx(frm_Delivery) 'Delivery
             objFilter.AddEx(frm_INVOICES) 'Invoice
@@ -180,12 +180,12 @@ Public Class clsListener
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_COMBO_SELECT)
             'objFilter.AddEx(frm_CommCharges) 'Commission Charges
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
             ''objFilter.AddEx(frm_OPRT) 'Promotion Template
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST)
             'objFilter.Add(frm_Project) ' Project
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
             objFilter.AddEx(frm_ITEM_MASTER) ' Item Master
             'objFilter.AddEx(frm_Banking) ' Banking
             'objFilter.AddEx(frm_CommCharges) 'Commission Charges
@@ -204,17 +204,17 @@ Public Class clsListener
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_LOST_FOCUS)
             'objFilter.AddEx(frm_ORDR) ' Order
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
             'objFilter.AddEx(frm_DocumentFreight) 'Document Freight
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD)
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
             'objFilter.AddEx(frm_OPRM) 'Promotion
             'objFilter.AddEx(frm_ORDR) ' Order
             ''objFilter.AddEx(frm_OPRT) 'Promotion Template
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_CLICK)
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
             'objFilter.AddEx(frm_Delivery) 'Delivery
             'objFilter.AddEx(frm_OPRM) 'Promotion
             'objFilter.AddEx(frm_ORDR) 'Order
@@ -270,7 +270,7 @@ Public Class clsListener
             'objFilter.AddEx(frm_OCPR) 'Promotion
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_VALIDATE)
-            objFilter.AddEx(frm_OPSP) 'Special Price
+            objFilter.AddEx(frm_OSUS) 'Special Price
             'objFilter.AddEx(frm_DocumentFreight) 'Document Freight
 
             'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_DOUBLE_CLICK)
@@ -299,7 +299,7 @@ Public Class clsListener
             Dim oForm As SAPbouiCOM.Form
             oForm = oApplication.SBO_Application.Forms.Item(BusinessObjectInfo.FormUID)
             Select Case BusinessObjectInfo.FormTypeEx
-                'Case frm_OPSP
+                'Case frm_OSUS
                 '    Dim objOSPS As clsSpecialPrice
                 '    objOSPS = New clsSpecialPrice
                 '    objOSPS.FormDataEvent(BusinessObjectInfo, BubbleEvent)
@@ -308,6 +308,7 @@ Public Class clsListener
                         Case SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD
                             If Not BusinessObjectInfo.BeforeAction Then
                                 If BusinessObjectInfo.ActionSuccess Then
+                                    Utilities.Message("Attempting to Create Journal Entry", SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
                                     oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
                                 End If
                             End If
@@ -317,8 +318,9 @@ Public Class clsListener
                         Case SAPbouiCOM.BoEventTypes.et_FORM_DATA_ADD
                             If Not BusinessObjectInfo.BeforeAction Then
                                 If BusinessObjectInfo.ActionSuccess Then
+                                    Utilities.Message("Attempting to Create Journal Entry", SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
                                     oApplication.Utilities.update_RMPCosting_Sale_In(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
-                                      oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
+                                    oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
                                 End If
                             End If
                     End Select
@@ -367,7 +369,7 @@ Public Class clsListener
                     '                End If
                     '            End If
                     '    End Select
-                    'Case frm_OPSP
+                    'Case frm_OSUS
                     '    Dim objOSPS As clsSpecialPrice
                     '    objOSPS = New clsSpecialPrice
                     '    objOSPS.FormDataEvent(BusinessObjectInfo, BubbleEvent)
@@ -405,7 +407,7 @@ Public Class clsListener
         Try
             If pVal.BeforeAction = False Then
                 Select Case pVal.MenuUID
-                    Case mnu_OPSP
+                    Case mnu_OSUS
                         oMenuObject = New clsOProjectSetup
                         oMenuObject.MenuEvent(pVal, BubbleEvent)
                         'Case mnu_PRJL, mnu_CPRL_O
@@ -514,7 +516,7 @@ Public Class clsListener
                             oItemObject.FrmUID = FormUID
                             _Collection.Add(FormUID, oItemObject)
                         End If
-                    Case frm_OPSP
+                    Case frm_OSUS
                         If Not _Collection.ContainsKey(FormUID) Then
                             oItemObject = New clsOProjectSetup
                             oItemObject.FrmUID = FormUID
@@ -538,7 +540,7 @@ Public Class clsListener
                         '        oItemObject.FrmUID = FormUID
                         '        _Collection.Add(FormUID, oItemObject)
                         '    End If
-                        'Case frm_OPSP
+                        'Case frm_OSUS
                         '    If Not _Collection.ContainsKey(FormUID) Then
                         '        oItemObject = New clsSpecialPrice
                         '        oItemObject.FrmUID = FormUID

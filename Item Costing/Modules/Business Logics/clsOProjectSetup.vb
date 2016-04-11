@@ -12,7 +12,7 @@
 
     Public Sub LoadForm()
         Try
-            oForm = oApplication.Utilities.LoadForm(xml_OPSP, frm_OPSP)
+            oForm = oApplication.Utilities.LoadForm(xml_OSUS, frm_OSUS)
             oForm = oApplication.SBO_Application.Forms.ActiveForm()
             oForm.Freeze(True)
             initializeDataSource(oForm)
@@ -40,7 +40,7 @@
     End Sub
     Private Sub initialize(ByVal oForm As SAPbouiCOM.Form)
         Try
-            oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+            oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
             oUsername = oForm.Items.Item("Item_0").Specific
             oPassword = oForm.Items.Item("Item_2").Specific
             oDocEntry = oForm.Items.Item("docEntry").Specific
@@ -56,7 +56,7 @@
             'clearDataSource(oForm)
 
             'oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            'oRecordSet.DoQuery("Select IsNull(MAX(DocEntry),1) From [@OPSP]")
+            'oRecordSet.DoQuery("Select IsNull(MAX(DocEntry),1) From [@OSUS]")
             'If Not oRecordSet.EoF Then
             '    oDBDataSource.SetValue("DocNum", 0, oRecordSet.Fields.Item(0).Value.ToString())
             'End If
@@ -93,7 +93,7 @@
     Public Overrides Sub MenuEvent(ByRef pVal As SAPbouiCOM.MenuEvent, ByRef BubbleEvent As Boolean)
         Try
             Select Case pVal.MenuUID
-                Case mnu_OPSP
+                Case mnu_OSUS
                     LoadForm()
                 Case mnu_FIRST, mnu_LAST, mnu_NEXT, mnu_PREVIOUS
                     oForm = oApplication.SBO_Application.Forms.ActiveForm()
@@ -102,9 +102,9 @@
                     End If
                 Case mnu_ADD_ROW
                     oForm = oApplication.SBO_Application.Forms.ActiveForm()
-                    If oForm.TypeEx = frm_OPSP Then
+                    If oForm.TypeEx = frm_OSUS Then
 
-                        oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+                        oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
                         If oDBDataSource.GetValue("Status", 0).Trim() = "C" Then
                             oApplication.Utilities.Message("Document Status Closed...", SAPbouiCOM.BoStatusBarMessageType.smt_Error)
                         Else
@@ -115,8 +115,8 @@
                     End If
                 Case mnu_DELETE_ROW
                     oForm = oApplication.SBO_Application.Forms.ActiveForm()
-                    If oForm.TypeEx = frm_OPSP Then
-                        oDBDataSource = oForm.DataSources.DBDataSources.Item("@OPSP")
+                    If oForm.TypeEx = frm_OSUS Then
+                        oDBDataSource = oForm.DataSources.DBDataSources.Item("@OSUS")
                         If oDBDataSource.GetValue("Status", 0).Trim() = "C" Then
                             oApplication.Utilities.Message("Document Status Closed...", SAPbouiCOM.BoStatusBarMessageType.smt_Error)
                         Else
@@ -128,7 +128,7 @@
                 Case mnu_ADD
                     If pVal.BeforeAction = False Then
                         oForm = oApplication.SBO_Application.Forms.ActiveForm()
-                        If oForm.TypeEx = frm_OPSP Then
+                        If oForm.TypeEx = frm_OSUS Then
                             initialize(oForm)
                             oForm.Items.Item("7").Enabled = False
                             oForm.Items.Item("19").Enabled = False
@@ -138,7 +138,7 @@
                 Case mnu_FIND
                     If pVal.BeforeAction = False Then
                         oForm = oApplication.SBO_Application.Forms.ActiveForm()
-                        If oForm.TypeEx = frm_OPSP Then
+                        If oForm.TypeEx = frm_OSUS Then
                             clearDataSource(oForm)
                             enableControl(oForm, True)
                             oForm.Items.Item("7").Enabled = True
@@ -155,7 +155,7 @@
 #End Region
     Public Overrides Sub ItemEvent(ByVal FormUID As String, ByRef pVal As SAPbouiCOM.ItemEvent, ByRef BubbleEvent As Boolean)
         Try
-            If pVal.FormTypeEx = frm_OPSP Then
+            If pVal.FormTypeEx = frm_OSUS Then
                 Select Case pVal.BeforeAction
                     Case True
                         Select Case pVal.EventType

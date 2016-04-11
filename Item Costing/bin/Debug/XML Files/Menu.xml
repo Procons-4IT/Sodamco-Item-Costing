@@ -3,13 +3,13 @@
     <action type="add">
 
       <Menu Checked="0" Enabled="1" FatherUID="11520" Image="" Position="1" String="Connection Project Setup"
-      Type="1" UniqueID="MNU_OPSP">
+      Type="1" UniqueID="MNU_OSUS">
       </Menu>
       <!-- <Menu Checked="0" Enabled="1" FatherUID="2816" Image="" Position="1" String="MultiCurrency Incoming Payment"
 				Type="1" UniqueID="DABT_521">
       </Menu> 
       <Menu Checked="0" Enabled="1" FatherUID="43541" Image="" Position="4" String="Special Price By Project"
-      Type="1" UniqueID="MNU_OPSP">
+      Type="1" UniqueID="MNU_OSUS">
       </Menu>
       <Menu Checked="0" Enabled="1" FatherUID="11264" Image="" Position="2" String="Commission Type"
       Type="1" UniqueID="MNU_OCMT">

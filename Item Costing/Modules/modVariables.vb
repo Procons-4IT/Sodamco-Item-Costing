@@ -53,7 +53,7 @@ Public Module modVariables
     Public Const mnu_DEFINE_ALTERNATIVE_ITEMS As String = "11531"
     Public Const mnu_DUPLICATE As String = "1287"
 
-    Public Const mnu_OPSP As String = "MNU_OPSP"
+    Public Const mnu_OSUS As String = "MNU_OSUS"
     'Public Const mnu_PRJL As String = "PrjList"
     'Public Const mnu_PRJL_C As String = "PrjList_C"
     'Public Const mnu_COMM_I As String = "ComChargesI"
@@ -69,8 +69,8 @@ Public Module modVariables
     Public Const xml_MENU As String = "Menu.xml"
     Public Const xml_MENU_REMOVE As String = "RemoveMenus.xml"
 
-    Public Const frm_OPSP As String = "frm_OPSP"
-    Public Const xml_OPSP As String = "frm_OPSP.xml"
+    Public Const frm_OSUS As String = "frm_OSUS"
+    Public Const xml_OSUS As String = "frm_OSUS.xml"
 
     'Public Const frm_PSPL As String = "frm_PSPL"
     'Public Const xml_PSPL As String = "frm_PSPL.xml"

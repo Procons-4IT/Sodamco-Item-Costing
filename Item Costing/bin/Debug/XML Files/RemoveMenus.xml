@@ -1,7 +1,7 @@
 ﻿<Application>
   <Menus>
     <action type="remove">
-      <Menu UniqueID="MNU_OPSP"></Menu>
+      <Menu UniqueID="MNU_OSUS"></Menu>
       <!--<Menu UniqueID="MNU_OCMT"></Menu>
       <Menu UniqueID="MNU_OPRM"></Menu>
       <Menu UniqueID="MNU_OCPR"></Menu>-->

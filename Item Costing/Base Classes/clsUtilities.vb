@@ -20,15 +20,19 @@ Public Class clsUtilities
         Dim strConnectionContext As String
 
         Try
-            strCookie = oApplication.Company.GetContextCookie
-            strConnectionContext = oApplication.SBO_Application.Company.GetConnectionContext(strCookie)
+            'strCookie = oApplication.Company.GetContextCookie
+            'strConnectionContext = oApplication.SBO_Application.Company.GetConnectionContext(strCookie)
 
-            If oApplication.Company.SetSboLoginContext(strConnectionContext) <> 0 Then
-                Throw New Exception("Wrong login credentials.")
-            End If
-
-            'Open a connection to company
-            If oApplication.Company.Connect() <> 0 Then
+            'If oApplication.Company.SetSboLoginContext(strConnectionContext) <> 0 Then
+            '    Throw New Exception("Wrong login credentials.")
+            'End If
+            'oApplication.Company.LicenseServer = "DESKTOP-PGT09IS:3000"
+            ''Open a connection to company
+            'If oApplication.Company.Connect() <> 0 Then
+            '    Throw New Exception("Cannot connect to company database. ")
+            'End If
+            oApplication.Company = oApplication.SBO_Application.Company.GetDICompany()
+            If Not oApplication.Company.Connected Then
                 Throw New Exception("Cannot connect to company database. ")
             End If
             orig_userName = oApplication.Company.UserName
@@ -56,6 +60,7 @@ Public Class clsUtilities
         newCompany.UseTrusted = oCompany.UseTrusted
         newCompany.LicenseServer = oCompany.LicenseServer
 
+
         Dim lRectCode As Integer = newCompany.Connect
         If lRectCode = 0 Then
 
@@ -70,8 +75,7 @@ Public Class clsUtilities
         userName = String.Empty
         Dim oTemp As SAPbobsCOM.Recordset
         oTemp = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-
-        oTemp.DoQuery("SELECT U_UserName,U_Password from [@OPSP] where DocEntry = 1")
+        oTemp.DoQuery("SELECT U_UserName,U_Password from [@OSUS] where DocEntry = 1")
         password = oTemp.Fields.Item(1).Value.ToString
         userName = oTemp.Fields.Item(0).Value.ToString
         Dim crypt As New CryptoUtility
@@ -149,6 +153,7 @@ Public Class clsUtilities
         Try
             If oRecordSet Is Nothing Then
                 oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+
             End If
 
             oRecordSet.DoQuery(SQL)
@@ -1384,36 +1389,37 @@ Public Class clsUtilities
 
             Select Case strDocType
                 Case frm_Delivery
-                    oDoc = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes)
+                    oDoc = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes)
                     strTable = "DLN1"
                     JERemarks = "Production Costing - Delivery"
                 Case frm_SaleReturn
-                    oDoc = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oReturns)
+                    oDoc = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oReturns)
                     strTable = "RDN1"
                     JERemarks = "Production Costing - Sale Return"
                 Case frm_INVOICES, frm_INVOICESPAYMENT
-                    oDoc = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInvoices)
+                    oDoc = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInvoices)
                     strTable = "INV1"
                     JERemarks = "Production Costing - Sale Invoice"
                 Case frm_ARCreditMemo
-                    oDoc = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oCreditNotes)
+                    oDoc = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oCreditNotes)
                     strTable = "RIN1"
                     JERemarks = "Production Costing - Sale Credit Memo"
                 Case frm_GI_INVENTORY
-                    oDoc = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInventoryGenExit)
+                    oDoc = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oInventoryGenExit)
                     strTable = "IGE1"
                     JERemarks = "Production Costing - Inventory Goods Issue"
             End Select
 
             If oDoc.Browser.GetByKeys(strObjectKey) Then
 
-                oApplication.Company.StartTransaction()
+                oApplication.AdminCompany.StartTransaction()
 
                 Dim intCurrentLine As Integer = 0
                 Dim blnJEAdd As Boolean = False
                 oDoc_Lines = oDoc.Lines
-
+                oApplication.Utilities.Message("Attempting to Create Admin Journal Entry", SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
                 oJE = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oJournalEntries)
+                oApplication.Utilities.Message("Admin Journal Entry Initiated", SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
                 oJE.ReferenceDate = oDoc.DocDate
                 oJE.TaxDate = oDoc.TaxDate
                 oJE.DueDate = oDoc.DocDueDate
@@ -1458,7 +1464,7 @@ Public Class clsUtilities
 
                     If (oDoc_Lines.UserFields.Fields.Item("U_JEDocEty").Value.ToString.Length = 0) Or (intMul = -1 And dblBaseQty <> oDoc_Lines.Quantity) Then
                         Dim dblCreditAmt As Double = 0
-                        oItem = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oItems)
+                        oItem = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oItems)
 
                         If oItem.GetByKey(oDoc_Lines.ItemCode) Then
                             oItemWhs = oItem.WhsInfo
@@ -1471,7 +1477,7 @@ Public Class clsUtilities
                                         Dim strWQuery, strRMAcct, strFLAcct, strVLAcct As String
                                         Dim oWhsRecordSet As SAPbobsCOM.Recordset
 
-                                        oWhsRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                                        oWhsRecordSet = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                                         strWQuery = "Select U_RMAcct,U_FLAcct,U_VLAcct From OWHS Where WhsCode = '" & oDoc_Lines.WarehouseCode & "'"
                                         oWhsRecordSet.DoQuery(strWQuery)
                                         If Not oWhsRecordSet.EoF Then
@@ -1585,7 +1591,7 @@ Public Class clsUtilities
                                 For intWhsIndex As Integer = 0 To oItemWhs.Count - 1
                                     oItemWhs.SetCurrentLine(intWhsIndex)
                                     If oItemWhs.WarehouseCode = oDoc_Lines.WarehouseCode Then
-                                        oWhsRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                                        oWhsRecordSet = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                                         strWQuery = "Select U_RMAcct,U_FLAcct,U_VLAcct From OWHS Where WhsCode = '" & oDoc_Lines.WarehouseCode & "'"
                                         oWhsRecordSet.DoQuery(strWQuery)
                                         If Not oWhsRecordSet.EoF Then
@@ -1657,7 +1663,7 @@ Public Class clsUtilities
                     ElseIf (oDoc_Lines.UserFields.Fields.Item("U_JEDocEty").Value.ToString.Length > 0) Then
                         If oDoc_Lines.BaseType.ToString() = "15" Or oDoc_Lines.BaseType.ToString() = "13" Then
                             Dim intCode1 As Integer
-                            oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                            oRecordSet = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                             strQuery = "Select ISNULL(StornoToTr,'0') From OJDT Where StornoToTr = '" + oDoc_Lines.UserFields.Fields.Item("U_JEDocEty").Value.ToString + "'"
                             oRecordSet.DoQuery(strQuery)
                             If oRecordSet.EoF Then
@@ -1670,9 +1676,9 @@ Public Class clsUtilities
                                         blnStatus = False
                                     Else
                                         Dim intJE As Integer
-                                        intJE = oApplication.Company.GetNewObjectKey()
+                                        intJE = oApplication.AdminCompany.GetNewObjectKey()
                                         If oJE.GetByKey(intJE) Then
-                                            oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                                            oRecordSet = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                                             strQuery = "Update " + strTable + " Set U_JEDocEty = '" + intJE.ToString + "' Where DocEntry = '" + oDoc.DocEntry.ToString + "' And LineNum = '" + oDoc_Lines.LineNum.ToString() + "'"
                                             oRecordSet.DoQuery(strQuery)
                                         End If
@@ -1687,6 +1693,7 @@ Public Class clsUtilities
                 If blnJEAdd Then
                     Dim intCode As Integer = oJE.Add()
                     If intCode <> 0 Then
+                        oApplication.Utilities.Message(String.Concat("ERROR Posting Journal Entry: ", oApplication.AdminCompany.GetLastErrorDescription()), SAPbouiCOM.BoStatusBarMessageType.smt_Error)
                         oApplication.SBO_Application.SetStatusBarMessage(oApplication.Company.GetLastErrorDescription(), SAPbouiCOM.BoMessageTime.bmt_Medium, True)
                         _retVal = False
                         blnStatus = False
@@ -1694,7 +1701,7 @@ Public Class clsUtilities
                         Dim intJE As Integer
                         intJE = Convert.ToInt32(oApplication.AdminCompany.GetNewObjectKey())
                         If oJE.GetByKey(intJE) Then
-                            oRecordSet = oApplication.Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                            oRecordSet = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                             strQuery = "Update " + strTable + " Set U_JEDocEty = '" + intJE.ToString + "' Where DocEntry = '" + oDoc.DocEntry.ToString + "' And ISNULL(U_JEDocEty,'') = ''"
                             oRecordSet.DoQuery(strQuery)
                         End If
@@ -1703,18 +1710,18 @@ Public Class clsUtilities
                 End If
 
                 If blnStatus Then
-                    If oApplication.Company.InTransaction Then
-                        oApplication.Company.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit)
+                    If oApplication.AdminCompany.InTransaction Then
+                        oApplication.AdminCompany.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit)
                     End If
                 Else
-                    If oApplication.Company.InTransaction Then
-                        oApplication.Company.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack)
+                    If oApplication.AdminCompany.InTransaction Then
+                        oApplication.AdminCompany.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack)
                     End If
                 End If
             End If
         Catch ex As Exception
-            oApplication.Company.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack)
-            oApplication.SBO_Application.SetStatusBarMessage(oApplication.Company.GetLastErrorDescription(), SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+            oApplication.AdminCompany.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack)
+            oApplication.SBO_Application.SetStatusBarMessage(oApplication.AdminCompany.GetLastErrorDescription(), SAPbouiCOM.BoMessageTime.bmt_Medium, True)
         End Try
         Return _retVal
     End Function
