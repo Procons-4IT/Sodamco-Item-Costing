@@ -309,7 +309,7 @@ Public Class clsListener
                             If Not BusinessObjectInfo.BeforeAction Then
                                 If BusinessObjectInfo.ActionSuccess Then
                                     Utilities.Message("Attempting to Create Journal Entry", SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
-                                    oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
+                                    oApplication.Utilities.post_JournalEntryWithCostCenter(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
                                 End If
                             End If
                     End Select
@@ -320,7 +320,7 @@ Public Class clsListener
                                 If BusinessObjectInfo.ActionSuccess Then
                                     Utilities.Message("Attempting to Create Journal Entry", SAPbouiCOM.BoStatusBarMessageType.smt_Warning)
                                     oApplication.Utilities.update_RMPCosting_Sale_In(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
-                                    oApplication.Utilities.post_JournalEntry(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
+                                    oApplication.Utilities.post_JournalEntryWithCostCenter(oForm, BusinessObjectInfo.FormTypeEx, BusinessObjectInfo.ObjectKey)
                                 End If
                             End If
                     End Select

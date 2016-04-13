@@ -1492,7 +1492,7 @@ Public Class clsUtilities
                                             blnJEAdd = True
                                             oJE.Lines.Credit = dblCreditAmt
                                             intCurrentLine += 1
-
+                                            'Setting the Debit of COG's Accounts (Reversing Transaction and distributing among the setup Accounts
                                             If CDbl(oItemWhs.UserFields.Fields.Item("U_AvgRMCst").Value) > 0 Then
                                                 oJE.Lines.Add()
                                                 oJE.Lines.SetCurrentLine(intCurrentLine)
@@ -1725,6 +1725,174 @@ Public Class clsUtilities
         End Try
         Return _retVal
     End Function
+    Public Function post_JournalEntryWithCostCenter(ByVal oForm As SAPbouiCOM.Form, ByVal strDocType As String, ByVal strObjectKey As String)
+        Try
+            Dim JECreated As Boolean = False
+            If frm_Delivery = strDocType Then
+                Dim strTable = "DLN1"
+                Dim JERemarks = "Production Costing - Delivery"
+                Dim tranStatus As SAPbobsCOM.BoWfTransOpt
+                Dim message As String
+                Dim messageType As SAPbouiCOM.BoStatusBarMessageType
+                Dim oDoc As SAPbobsCOM.Documents = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oDeliveryNotes)
+
+                If oDoc.Browser.GetByKeys(strObjectKey) Then
+
+                    oApplication.AdminCompany.StartTransaction()
+                    oApplication.Utilities.Message("Attempting to Create Admin Journal Entry", SAPbouiCOM.BoStatusBarMessageType.smt_None)
+
+                    Dim oJE As SAPbobsCOM.JournalEntries = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oJournalEntries)
+                    'Setting Header Data
+                    oJE.ReferenceDate = oDoc.DocDate
+                    oJE.TaxDate = oDoc.TaxDate
+                    oJE.DueDate = oDoc.DocDueDate
+                    oJE.Memo = JERemarks
+                    oJE.Reference = JERemarks
+                    oJE.Reference2 = oDoc.DocEntry
+                    oJE.Reference3 = oDoc.Lines.LineNum.ToString()
+
+                    'Setting Lines Data
+                    Dim accounts As List(Of clsJournalLines) = getJournalLinesList(oDoc, strDocType)
+                    For Each account As clsJournalLines In accounts
+                        oJE.Lines.AccountCode = account.AccountCode
+                        oJE.Lines.Debit = account.Debit
+                        oJE.Lines.Credit = account.Credit
+                        oJE.Lines.CostingCode = account.CostingCode
+                        oJE.Lines.CostingCode2 = account.CostingCode2
+                        oJE.Lines.CostingCode3 = account.CostingCode3
+                        oJE.Lines.CostingCode4 = account.CostingCode4
+                        oJE.Lines.CostingCode5 = account.CostingCode5
+                        oJE.Lines.Add()
+                    Next
+                    'Adding Journal Entry
+                    If Not oJE.Add = 0 Then
+                        message = String.Concat("Error In Adding the Admin Journal Entry: ", oApplication.AdminCompany.GetLastErrorDescription())
+                        messageType = SAPbouiCOM.BoStatusBarMessageType.smt_Error
+                        tranStatus = SAPbobsCOM.BoWfTransOpt.wf_RollBack
+
+                    Else
+                        message = String.Concat("Admin Jounal Entry Generated ", oApplication.AdminCompany.GetNewObjectKey())
+                        messageType = SAPbouiCOM.BoStatusBarMessageType.smt_Success
+                        tranStatus = SAPbobsCOM.BoWfTransOpt.wf_Commit
+                        JECreated = True
+                        'Update Delivery Document
+                        oRecordSet = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                        Dim strQuery As String = String.Concat("Update ", strTable, " Set U_JEDocEty = '", oApplication.AdminCompany.GetNewObjectKey(), "' Where DocEntry = '", oDoc.DocEntry.ToString(), "' And LineNum = '", oDoc.Lines.LineNum.ToString(), "'")
+                        oRecordSet.DoQuery(strQuery)
+                    End If
+                    oApplication.Utilities.Message(message, messageType)
+                    oApplication.AdminCompany.EndTransaction(tranStatus)
+
+                End If
+                Return JECreated
+            Else
+                Return post_JournalEntry(oForm, strDocType, strObjectKey)
+            End If
+        Catch ex As Exception
+            If oApplication.AdminCompany.InTransaction Then
+                oApplication.AdminCompany.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack)
+            End If
+            oApplication.Utilities.Message(String.Concat("BaseClasses.clsUtilities.post.JournalEntryWithCostCenter: ", ex.ToString), SAPbouiCOM.BoStatusBarMessageType.smt_Error)
+            Return False
+        End Try
+    End Function
+
+    Public Function getJournalLinesList(ByRef deliveryDoc As SAPbobsCOM.Documents, ByVal strDocType As String) As List(Of clsJournalLines)
+            Dim accounts As List(Of clsJournalLines) = New List(Of clsJournalLines)
+            Dim oItem As SAPbobsCOM.Items = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oItems)
+            Dim oWhsInfo As SAPbobsCOM.ItemWarehouseInfo
+            Dim strRMAcct, strFLAcct, strVLAcct As String
+            Dim avgRM, avgFL, avgVL As Double
+            Dim dblCreditAmt As Double = 0
+        Try
+
+            'Find the Accounts in the Items
+
+            'Iterate over the Delivery Lines and check at the dimensions
+            For i As Integer = 0 To deliveryDoc.Lines.Count - 1
+                deliveryDoc.Lines.SetCurrentLine(i)
+                If oItem.GetByKey(deliveryDoc.Lines.ItemCode) Then
+                    Dim tempDocLine As clsJournalLines = New clsJournalLines()
+                    oWhsInfo = oItem.WhsInfo
+                    For j As Integer = 0 To oWhsInfo.Count - 1
+                        oWhsInfo.SetCurrentLine(j)
+                        'Find the Warehouse Accounts
+                        If oWhsInfo.WarehouseCode = deliveryDoc.Lines.WarehouseCode Then
+                            Exit For
+                        End If
+                    Next j
+                    strRMAcct = getAccount(oWhsInfo.UserFields.Fields.Item("U_RMAcct").Value)
+                    strFLAcct = getAccount(oWhsInfo.UserFields.Fields.Item("U_FLAcct").Value)
+                    strVLAcct = getAccount(oWhsInfo.UserFields.Fields.Item("U_VLAcct").Value)
+
+                    avgRM = CDbl(oWhsInfo.UserFields.Fields.Item("U_AvgRMCst").Value)
+                    avgFL = CDbl(oWhsInfo.UserFields.Fields.Item("U_AvgFLbCst").Value)
+                    avgVL = CDbl(oWhsInfo.UserFields.Fields.Item("U_AvgVLbCst").Value)
+
+                    Dim costAccounts = New String() {strRMAcct, strFLAcct, strVLAcct}
+                    Dim costAmounts = New String() {avgRM, avgFL, avgVL}
+                    'Adding the Credit Account of each Item (Raw Material,Fixed Labour, Variable Labour)
+                    For k As Integer = 0 To 2
+                        Dim tempAcct As clsJournalLines = New clsJournalLines()
+                        tempAcct.AccountCode = costAccounts(k)
+                        tempAcct.Credit = costAmounts(k) * deliveryDoc.Lines.Quantity
+
+                        If Not tempAcct.Credit = 0 Then
+                            FillJournalLineCostCenterProperties(tempAcct, deliveryDoc.Lines)
+                            AddAccount(accounts, tempAcct)
+                        End If
+                    Next
+
+                    'Debit the Other COGs Account
+                    Dim tempDebitAcct As clsJournalLines = New clsJournalLines()
+
+                    'Check if this is always the account or changes
+                    If strDocType = frm_GI_INVENTORY Then
+                        tempDebitAcct.AccountCode = deliveryDoc.Lines.AccountCode
+                    Else
+                        tempDebitAcct.AccountCode = deliveryDoc.Lines.COGSAccountCode
+                    End If
+
+                    tempDebitAcct.Debit = (avgRM + avgFL + avgVL) * deliveryDoc.Lines.Quantity
+
+                    If Not tempDebitAcct.Debit = 0 Then
+                        FillJournalLineCostCenterProperties(tempDebitAcct, deliveryDoc.Lines)
+                        AddAccount(accounts, tempDebitAcct)
+                    End If
+
+
+                End If
+            Next i
+        Catch ex As Exception
+            oApplication.Utilities.Message(String.Concat("Error Occured At BaseClasses.clsUtility.getJournalLinesList ", ex.ToString()), SAPbouiCOM.BoStatusBarMessageType.smt_Error)
+        End Try
+        Return accounts
+    End Function
+    Private Sub FillJournalLineCostCenterProperties(ByRef updateAccount As clsJournalLines, ByRef properties As SAPbobsCOM.Document_Lines)
+        updateAccount.CostingCode = properties.CostingCode
+        updateAccount.CostingCode2 = properties.CostingCode2
+        updateAccount.CostingCode3 = properties.CostingCode3
+        updateAccount.CostingCode4 = properties.CostingCode4
+        updateAccount.CostingCode5 = properties.CostingCode5
+
+    End Sub
+    Private Sub AddAccount(ByRef accounts As List(Of clsJournalLines), ByVal account As clsJournalLines)
+        Try
+            'If the accounts exists update the amounts
+            For Each acct As clsJournalLines In accounts
+                If acct.AccountCode = account.AccountCode And account.CostingCode = account.CostingCode And acct.CostingCode2 = account.CostingCode2 And acct.CostingCode3 = account.CostingCode3 And acct.CostingCode4 = account.CostingCode4 And acct.CostingCode5 = account.CostingCode5 Then
+                    acct.Credit += account.Credit
+                    acct.Debit += account.Debit
+                    Exit Sub
+                End If
+            Next
+            'If it doesn't then add the new account
+            accounts.Add(account)
+        Catch ex As Exception
+            oApplication.Utilities.Message(String.Concat("Error Occured At BaseClasses.clsUtility.AddAccount: ", ex.ToString()), SAPbouiCOM.BoStatusBarMessageType.smt_Error)
+        End Try
+
+    End Sub
 
 #End Region
 

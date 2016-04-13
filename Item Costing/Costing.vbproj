@@ -112,6 +112,7 @@
     <Compile Include="Modules\Business Logics\clsPurchaseReturn.vb" />
     <Compile Include="Modules\Business Logics\clsAPCreditMemo.vb" />
     <Compile Include="Modules\Business Logics\Custom_ChooseFromList.vb" />
+    <Compile Include="Modules\Models\clsJournalLines.vb" />
     <Compile Include="Modules\modVariables.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
