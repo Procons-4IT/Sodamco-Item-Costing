@@ -99,6 +99,7 @@
     <Compile Include="Modules\Business Logics\clsGRPO.vb" />
     <Compile Include="Modules\Business Logics\clsItemMaster.vb" />
     <Compile Include="Modules\Business Logics\clsOProjectSetup.vb" />
+    <Compile Include="Modules\Business Logics\clsPickList.vb" />
     <Compile Include="Modules\Business Logics\clsProdReceipt.vb" />
     <Compile Include="Modules\Business Logics\clsReturn.vb" />
     <Compile Include="Modules\Business Logics\clsInvoice.vb" />

@@ -63,7 +63,7 @@ Public Class clsUtilities
 
         Dim lRectCode As Integer = newCompany.Connect
         If lRectCode = 0 Then
-
+            newCompany.XmlExportType = SAPbobsCOM.BoXmlExportTypes.xet_ExportImportMode
             Return newCompany
         End If
 
@@ -1769,7 +1769,7 @@ Public Class clsUtilities
                         message = String.Concat("Error In Adding the Admin Journal Entry: ", oApplication.AdminCompany.GetLastErrorDescription())
                         messageType = SAPbouiCOM.BoStatusBarMessageType.smt_Error
                         tranStatus = SAPbobsCOM.BoWfTransOpt.wf_RollBack
-
+                        oJE.SaveXML("JE_Error.xml")
                     Else
                         message = String.Concat("Admin Jounal Entry Generated ", oApplication.AdminCompany.GetNewObjectKey())
                         messageType = SAPbouiCOM.BoStatusBarMessageType.smt_Success
@@ -1803,7 +1803,6 @@ Public Class clsUtilities
             Dim oWhsInfo As SAPbobsCOM.ItemWarehouseInfo
             Dim strRMAcct, strFLAcct, strVLAcct As String
             Dim avgRM, avgFL, avgVL As Double
-            Dim dblCreditAmt As Double = 0
         Try
 
             'Find the Accounts in the Items
@@ -1837,10 +1836,8 @@ Public Class clsUtilities
                         tempAcct.AccountCode = costAccounts(k)
                         tempAcct.Credit = costAmounts(k) * deliveryDoc.Lines.Quantity
 
-                        If Not tempAcct.Credit = 0 Then
-                            FillJournalLineCostCenterProperties(tempAcct, deliveryDoc.Lines)
-                            AddAccount(accounts, tempAcct)
-                        End If
+                        AddAccount(accounts, tempAcct, deliveryDoc.Lines)
+
                     Next
 
                     'Debit the Other COGs Account
@@ -1854,11 +1851,7 @@ Public Class clsUtilities
                     End If
 
                     tempDebitAcct.Debit = (avgRM + avgFL + avgVL) * deliveryDoc.Lines.Quantity
-
-                    If Not tempDebitAcct.Debit = 0 Then
-                        FillJournalLineCostCenterProperties(tempDebitAcct, deliveryDoc.Lines)
-                        AddAccount(accounts, tempDebitAcct)
-                    End If
+                    AddAccount(accounts, tempDebitAcct, deliveryDoc.Lines)
 
 
                 End If
@@ -1876,9 +1869,13 @@ Public Class clsUtilities
         updateAccount.CostingCode5 = properties.CostingCode5
 
     End Sub
-    Private Sub AddAccount(ByRef accounts As List(Of clsJournalLines), ByVal account As clsJournalLines)
+    Private Sub AddAccount(ByRef accounts As List(Of clsJournalLines), ByVal account As clsJournalLines, ByRef dimensionProperties As SAPbobsCOM.Document_Lines)
         Try
             'If the accounts exists update the amounts
+            If String.IsNullOrEmpty(account.AccountCode) Or (account.Debit = 0 And account.Credit = 0) Then
+                Exit Sub
+            End If
+            FillJournalLineCostCenterProperties(account, dimensionProperties)
             For Each acct As clsJournalLines In accounts
                 If acct.AccountCode = account.AccountCode And account.CostingCode = account.CostingCode And acct.CostingCode2 = account.CostingCode2 And acct.CostingCode3 = account.CostingCode3 And acct.CostingCode4 = account.CostingCode4 And acct.CostingCode5 = account.CostingCode5 Then
                     acct.Credit += account.Credit
@@ -1888,6 +1885,7 @@ Public Class clsUtilities
             Next
             'If it doesn't then add the new account
             accounts.Add(account)
+
         Catch ex As Exception
             oApplication.Utilities.Message(String.Concat("Error Occured At BaseClasses.clsUtility.AddAccount: ", ex.ToString()), SAPbouiCOM.BoStatusBarMessageType.smt_Error)
         End Try

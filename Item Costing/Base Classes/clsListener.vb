@@ -105,6 +105,8 @@ Public Class clsListener
             objFilter.AddEx(frm_INVOICES) 'Invoice
             objFilter.AddEx(frm_SaleReturn) 'Return
             objFilter.AddEx(frm_ARCreditMemo) 'AR Credit Memo
+            objFilter.AddEx(frm_PickList)
+
             'objFilter.AddEx(frm_Customer) 'Customer
             'objFilter.AddEx(frm_ORDR) 'Order
             objFilter.AddEx(frm_OSUS) 'Special Price
@@ -144,6 +146,7 @@ Public Class clsListener
             objFilter.AddEx(frm_ARCreditMemo) 'AR Credit Memo
             objFilter.AddEx(frm_ARReverseInvoice) 'Reverse Invoice
             objFilter.AddEx(frm_GI_INVENTORY) ' Inventory Goods Issue
+            objFilter.AddEx(frm_PickList)
 
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_MENU_CLICK)
@@ -154,6 +157,7 @@ Public Class clsListener
             'objFilter.AddEx(frm_Deposits) 'Deposits
             'objFilter.AddEx(frm_OCPR) 'Promotion Mapping
             objFilter.AddEx(frm_OSUS) 'Special Price
+            objFilter.AddEx(frm_PickList)
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED)
             objFilter.AddEx(frm_OSUS) 'Special Price
@@ -177,11 +181,13 @@ Public Class clsListener
             'objFilter.AddEx(frm_DocumentFreight) 'Document Freight
             objFilter.AddEx(frm_GI_INVENTORY) ' Inventory Goods Issue
             objFilter.AddEx(frm_INVOICESPAYMENT) ' Invoice + Payment
+            objFilter.AddEx(frm_PickList)
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_COMBO_SELECT)
             'objFilter.AddEx(frm_CommCharges) 'Commission Charges
             objFilter.AddEx(frm_OSUS) 'Special Price
             ''objFilter.AddEx(frm_OPRT) 'Promotion Template
+            objFilter.AddEx(frm_PickList)
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST)
             'objFilter.Add(frm_Project) ' Project
@@ -196,6 +202,7 @@ Public Class clsListener
             'objFilter.AddEx(frm_OPRT) 'Promotion Template
             'objFilter.AddEx(frm_PRT2) 'Promotion Child - 2
             'objFilter.AddEx(frm_Freight) 'Promotion Mapping
+            objFilter.AddEx(frm_PickList)
 
             'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_KEY_DOWN)
             'objFilter.AddEx(frm_ORDR) ' Order
@@ -206,12 +213,14 @@ Public Class clsListener
             'objFilter.AddEx(frm_ORDR) ' Order
             objFilter.AddEx(frm_OSUS) 'Special Price
             'objFilter.AddEx(frm_DocumentFreight) 'Document Freight
+            objFilter.AddEx(frm_PickList)
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_FORM_DATA_LOAD)
             objFilter.AddEx(frm_OSUS) 'Special Price
             'objFilter.AddEx(frm_OPRM) 'Promotion
             'objFilter.AddEx(frm_ORDR) ' Order
             ''objFilter.AddEx(frm_OPRT) 'Promotion Template
+            objFilter.AddEx(frm_PickList)
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_CLICK)
             objFilter.AddEx(frm_OSUS) 'Special Price
@@ -227,6 +236,7 @@ Public Class clsListener
             objFilter.AddEx(frm_INVOICESPAYMENT) ' Invoice + Payment
             objFilter.AddEx(frm_ARCreditMemo) ' AR Credit Memo
             objFilter.AddEx(frm_ARReverseInvoice) 'Reverse Invoice
+            objFilter.AddEx(frm_PickList)
 
             'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_RIGHT_CLICK)
             'objFilter.AddEx(frm_ORDR) 'Order
@@ -251,6 +261,7 @@ Public Class clsListener
             objFilter.AddEx(frm_I_Transfer) ' Inventory Transfer
             objFilter.AddEx(frm_PurReturn) ' Purchase Return
             objFilter.AddEx(frm_APCreditMemo) ' AP Credit Memo
+            objFilter.AddEx(frm_PickList)
 
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_FORM_DATA_UPDATE)
             objFilter.AddEx(frm_Delivery) 'Delivery
@@ -272,6 +283,7 @@ Public Class clsListener
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_VALIDATE)
             objFilter.AddEx(frm_OSUS) 'Special Price
             'objFilter.AddEx(frm_DocumentFreight) 'Document Freight
+            objFilter.AddEx(frm_PickList)
 
             'objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_DOUBLE_CLICK)
             ''objFilter.AddEx(frm_OPRT) 'Promotion Template           
@@ -280,6 +292,7 @@ Public Class clsListener
             objFilter = objFilters.Add(SAPbouiCOM.BoEventTypes.et_PICKER_CLICKED)
             'objFilter.Add(frm_Project) 'Project
             objFilter.Add(frm_ITEM_MASTER) 'Item Master
+            objFilter.AddEx(frm_PickList)
 
             SetFilter(objFilters)
         Catch ex As Exception
@@ -546,6 +559,12 @@ Public Class clsListener
                         '        oItemObject.FrmUID = FormUID
                         '        _Collection.Add(FormUID, oItemObject)
                         '    End If
+                    Case frm_PickList
+                        If Not _Collection.ContainsKey(FormUID) Then
+                            oItemObject = New clsPickList
+                            oItemObject.FrmUID = FormUID
+                            _Collection.Add(FormUID, oItemObject)
+                        End If
                     Case frm_ProdReceipt
                         If Not _Collection.ContainsKey(FormUID) Then
                             oItemObject = New clsProdReceipt

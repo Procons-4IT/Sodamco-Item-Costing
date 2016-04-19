@@ -39,7 +39,7 @@ Public Module modVariables
     Public Const frm_I_Transfer As Integer = 940
     Public Const frm_PurReturn As Integer = 182
     Public Const frm_APCreditMemo As Integer = 181
-
+    Public Const frm_PickList As Integer = 81
     Public Const mnu_FIND As String = "1281"
     Public Const mnu_ADD As String = "1282"
     Public Const mnu_CLOSE As String = "1286"
