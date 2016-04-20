@@ -2,6 +2,7 @@
 Public Class clsPickList
     Inherits clsBase
     Dim WithEvents CreateComboBox As SAPbouiCOM.ComboBox
+    Dim latestDeliveryKey As String
 #Region "Item Event"
     Public Overrides Sub ItemEvent(ByVal FormUID As String, ByRef pVal As SAPbouiCOM.ItemEvent, ByRef BubbleEvent As Boolean)
         Try
@@ -52,19 +53,30 @@ Public Class clsPickList
     Public Sub CreateComboxEvent(sboObject As Object, pVal As SAPbouiCOM.SBOItemEventArg) Handles CreateComboBox.ComboSelectAfter
 
         If pVal.PopUpIndicator = 1 Then
-            Dim strKey
-            oApplication.Company.GetNewObjectCode(strKey)
-            Dim recordSet As SAPbobsCOM.Recordset = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            recordSet.DoQuery("SELECT a.DocEntry from ODLN a where MONTH(a.DocDate) = MONTH(GETDATE()) AND DAY(a.DocDate) = DAY(GETDATE())order by DocEntry desc")
-            strKey = recordSet.Fields.Item(0).Value.ToString
-            If Not String.IsNullOrEmpty(strKey) Or strKey = "0" Then
+            Dim strKey = String.Empty
+            getLatestDeliveryKey(strKey)
+            If Not strKey.Equals(latestDeliveryKey) Then
                 strKey = "<?xml version=""1.0"" encoding=""UTF-16"" ?><DocumentParams><DocEntry>" + strKey + "</DocEntry></DocumentParams>"
                 oApplication.Utilities.post_JournalEntryWithCostCenter(oForm, frm_Delivery, strKey)
+                latestDeliveryKey = String.Empty
             Else
                 oApplication.Utilities.Message("Error Journal Entry Could Not be Created", SAPbouiCOM.BoStatusBarMessageType.smt_Error)
             End If
 
         End If
     End Sub
+    Public Sub CreateComboBoxBeforeEvent(sboObject As Object, pVal As SAPbouiCOM.SBOItemEventArg, ByRef BubbleEvent As Boolean) Handles CreateComboBox.ComboSelectBefore
+        BubbleEvent = True
+        If pVal.PopUpIndicator = 1 Then
+            getLatestDeliveryKey(latestDeliveryKey)
 
+        End If
+
+    End Sub
+
+    Private Sub getLatestDeliveryKey(ByRef deliveryKey)
+        Dim recordSet As SAPbobsCOM.Recordset = oApplication.AdminCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+        recordSet.DoQuery("SELECT a.DocEntry from ODLN a order by DocEntry desc")
+        deliveryKey = recordSet.Fields.Item(0).Value.ToString
+    End Sub
 End Class
