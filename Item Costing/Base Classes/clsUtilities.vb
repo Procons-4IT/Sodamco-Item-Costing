@@ -38,8 +38,6 @@ Public Class clsUtilities
             orig_userName = oApplication.Company.UserName
             orig_password = oApplication.Company.Password
 
-
-
         Catch ex As Exception
             Throw ex
         End Try
@@ -66,7 +64,8 @@ Public Class clsUtilities
             newCompany.XmlExportType = SAPbobsCOM.BoXmlExportTypes.xet_ExportImportMode
             Return newCompany
         End If
-
+        Dim er As String = newCompany.GetLastErrorDescription()
+        oApplication.Utilities.Message("Error Could not Login with Master Credentials: " + er, SAPbouiCOM.BoStatusBarMessageType.smt_Error)
         Return Nothing
 
     End Function
